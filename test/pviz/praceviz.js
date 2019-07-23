@@ -25,56 +25,57 @@ looker.plugins.visualizations.add({
          // Grab the first cell of the data.
          this.clearErrors();
          console.log(data);
-    var firstRow = data[0];
-    var firstCell = firstRow[queryResponse.fields.dimensions[0].name];
-        console.log(firstRow);
-        console.log(queryResponse.fields.dimensions);
-    // Insert the data into the page.
-    this._textElement.innerHTML = LookerCharts.Utils.htmlForCell(firstCell);
+         measure0=queryResponse.fields.dimensions[0].name;
+         measure1=queryResponse.fields.dimensions[1].name;
+    // var firstRow = data[0];
+    // var firstCell = firstRow[queryResponse.fields.dimensions[0].name];
+    //     console.log(firstRow);
+    //     console.log(queryResponse.fields.dimensions);
+    // // Insert the data into the page.
+    // this._textElement.innerHTML = LookerCharts.Utils.htmlForCell(firstCell);
      dataSet=data;
-      calcYears();
-      prepareData();
-      drawChart();
+     calcYears();
+     prepareData();
+     drawChart();
    // Always call done to indicate a visualization has finished rendering.
     done()
     }
   })
 
-//   //Copyright Tamer Marzouk
-// let CSVDataURL='https://tamermarzouk.github.io/data/valueaddedperindustry.csv';
-// const participantFieldName="Industry";
-// var dataSet=[];
-// d3.csv(CSVDataURL).then(data=>{
-//   console.log('Data loaded',data.length);
-//   dataSet=data;
-//   calcYears();
-//   prepareData();
-//   drawChart();
-// });
-
-
-
+//   //@author Tamer Marzouk
+//   //@ for peagsus-oe
+var participants=[];
+var colorScale;
 var currentYear=0;
 var years=[];
 var yearsIndex=0;
 var interval=1;
+var fixedData;
+var measure0;
+var measure1;
 
 function calcYears(){
-  years=Object.keys(dataSet[0]);
+  //console.log(dataSet[0][measure1])
+  years=Object.keys(dataSet[0][measure1]);
+  //console.log(years);
   years=years.filter(key=>{
     if(!isNaN(parseInt(key))){
       return 1;
     }
     return 0;
   });
-  //console.log(years)
+  console.log(years)
   currentYear=d3.min(years);
 }
 
-var participants=[];
-var colorScale;
+
 
 function prepareData(){
+  //get participants
+  dataSet.forEach(d=>{
+    participants.push(d[measure0])
+  })
+  console.log(participants);
   colorScale=d3.scaleOrdinal().domain(participants).range(["#ff31dc","#3d21c9","#c0f1ff",
 
 "#a528de",
@@ -229,19 +230,18 @@ function prepareData(){
 
 }
 
-var maxValues=[];
-var minValues=[];
+
 var overallMin=0;
 var overallMax=0;
 function calcMaxValues(dataset){
+  var maxValues=[];
+var minValues=[];
   for(let i=0;i<years.length-1;i++){
     let myyear=years[i];
-    let minmax=d3.extent(dataset,d=>d[myyear]?parseFloat(d[myyear]):0);
-    
+    let minmax=d3.extent(dataset,d=>d[measure1][myyear].value);
     console.log('Year:',years[i], ', minimum:',minmax[0],', maximum:',minmax[1])  
     maxValues.push(minmax[1]);
     minValues.push(minmax[0])
-   
   }
   overallMax=d3.max(maxValues);
   overallMin=d3.min(minValues);
@@ -251,25 +251,39 @@ function calcMaxValues(dataset){
  var widthScale;
 function prepareChart(w,h){
  widthScale=d3.scaleLinear().domain([overallMax,overallMin]).range([w,0]);
+  // console.log(widthScale(overallMin))
+  // console.log(widthScale(overallMax))
+}
+
+function sortDataSet(){
+   //sort data by GDP
+  dataSet=dataSet.sort((a,b,i)=>{
+    //console.log(a,b)
+    return b[measure1][currentYear].value-a[measure1][currentYear].value;
+  })
 }
 function drawChart(){
   
-  let h=800;
-  let w=800;
+
   var chart=d3.select('.tmm_main');
+  
   var svg=chart.append('svg')
-  .attr('width',w+250)
-  .attr('height',h);
- participants=dataSet.map(d=>{
-    return d[participantFieldName.trim()];
-  });
-    
+  .attr("preserveAspectRatio", "xMinYMin")
+  .attr('width','800px')
+  .attr('height','600px')
+  let container=chart.node().getBoundingClientRect();
+   // svg.attr('viewBox','0 0 '+Math.min(container.width,container.height) +' '+Math.max(container.width,container.height) )
+        svg.attr('width',container.width+'px');
+  svg.attr('height',container.height+'px');
+  
+ let w=container.width;
+  let h=container.height;
+     console.log(`width:${w}, height:${h}`);
   calcMaxValues(dataSet);
   prepareChart(w,h)
-  //sort data by GDP
-  dataSet=dataSet.sort((a,b,i)=>{
-    return b[currentYear]-a[currentYear];
-  })
+ // console.log(yScale(maxGDP))
+ // console.log(widthScale(minGDP))
+ sortDataSet();
   
 svg
   .append('text')
@@ -278,7 +292,6 @@ svg
   .attr('y',20)
   .attr('class','year')
   .text('Year = '+currentYear)
-
   //replay
     svg
   .append('text')
@@ -308,16 +321,16 @@ svg
   .attr('x',130)
   .attr('y',(d,i)=>i*20+50)
   .attr('key',(d,i)=>i)
-  .attr('width',(d)=>widthScale(!isNaN(parseFloat(d[currentYear]))?parseFloat(d[currentYear]):0))
+  .attr('width',(d)=>widthScale(parseFloat(d[measure1][currentYear].value)))
   .attr('height',12)
-  .attr('fill',d=>colorScale(d[participantFieldName]))
+  .attr('fill',d=>colorScale(d[measure0].value))
    .on('click',o=>{
   console.log(o['Country Code'])
 })
   group.append('title')
   .attr('class','title')
 .attr('key',(d,i)=>i)
-    .text(d=>d[participantFieldName]+' '+d[currentYear])
+    .text(d=>d[measure0].value+' '+d[measure1][currentYear].value)
   group.append('text')
   .attr('x',20)
   .attr('y',(d,i)=>i*20+60)
@@ -325,9 +338,9 @@ svg
   .attr('font-size',10)
   .attr('fill','black')
   .attr('class','participant')
-  .text(d=>d[participantFieldName])
+  .text(d=>d[measure0].value)
    group.append('text')
-  .attr('x',d=>150+widthScale(parseInt(d[currentYear])))
+  .attr('x',d=>150+widthScale(d[measure1][currentYear].value))
   .attr('y',(d,i)=>i*20+60)
    .attr('key',(d,i)=>i)
   .attr('font-size',10)
@@ -335,10 +348,10 @@ svg
   .style('stroke','red')
   .style('stroke-width','0.3px')
   .attr('class','value')
-  .text(d=>parseInt(d[currentYear]))
+  .text(d=>parseInt(d[measure1][currentYear].value))
 
   
-  transition(svg,group,widthScale);
+ setTimeout(()=> transition(svg,group,widthScale),1000);
 }
 
 function transition(svg,group,widthScale){
@@ -355,11 +368,9 @@ function transition(svg,group,widthScale){
   currentYear=years[yearsIndex];
   console.log(currentYear);
   //sort for currentYear
- dataSet=dataSet.sort((a,b)=>{
-    return b[currentYear]-a[currentYear];
-  });
+sortDataSet();
   
-  let dur=1500;
+  let dur=2000;
   let del=100;
  // d3.transition().duration(11000).delay(12000).each(()=>{
   let myTrans=d3.transition().ease(d3.easeLinear).duration(dur)//.delay((d,i)=>i*del);
@@ -368,22 +379,22 @@ function transition(svg,group,widthScale){
   
      group.selectAll('.title').transition(myTrans).text(d=>{
    console.log(currentYear)
-   return d[participantFieldName]+' '+d[currentYear];
+   return d[measure0].value+' '+d[measure1][currentYear].value;
  })
- group.selectAll('.value').transition(myTrans).attr('x',d=>150+widthScale(parseInt(d[currentYear])))
+ group.selectAll('.value').transition(myTrans).attr('x',d=>150+widthScale(d[measure1][currentYear].value))
   .attr('y',(d,i,t)=>{
   let newIndex=dataSet.indexOf(d)
    return newIndex*20+60;
  }).text(d=>{
    console.log(currentYear)
-   return parseInt(d[currentYear])
+   return d[measure1][currentYear].rendered
  })
    
  group.selectAll('.participant').transition(myTrans).attr('y',(d,i,t)=>{
  let newIndex=dataSet.indexOf(d)
    return newIndex*20+60
  })
-  group.selectAll('rect').transition(myTrans).attr('width',d=>widthScale(!isNaN(parseFloat(d[currentYear]))?parseFloat(d[currentYear]):0))
+  group.selectAll('rect').transition(myTrans).attr('width',d=>widthScale(d[measure1][currentYear].value))
      .attr('y',(d,i,t)=>{
        let newIndex=dataSet.indexOf(d)
      
@@ -395,8 +406,6 @@ function transition(svg,group,widthScale){
 //  })
 myTrans.on('end',()=>{
     console.log(' calling transition!:',yearsIndex)
-    setTimeout(()=>{transition(svg,group,widthScale)},100*yearsIndex)
+    setTimeout(()=>{transition(svg,group,widthScale)},1000*yearsIndex)
   });
 }
-
-

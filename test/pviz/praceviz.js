@@ -25,6 +25,7 @@ looker.plugins.visualizations.add({
          // Grab the first cell of the data.
          this.clearErrors();
          console.log(data);
+         console.log(queryResponse.fields)
          measure0=queryResponse.fields.dimensions[0].name;
          measure1=queryResponse.fields.dimensions[1].name;
     // var firstRow = data[0];

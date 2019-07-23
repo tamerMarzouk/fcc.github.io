@@ -39,12 +39,6 @@ looker.plugins.visualizations.add({
          console.log(queryResponse.fields)
          measure0=queryResponse.fields.dimensions[0].name;
          measure1=queryResponse.fields.measures[0].name;
-    // var firstRow = data[0];
-    // var firstCell = firstRow[queryResponse.fields.dimensions[0].name];
-    //     console.log(firstRow);
-    //     console.log(queryResponse.fields.dimensions);
-    // // Insert the data into the page.
-    // this._textElement.innerHTML = LookerCharts.Utils.htmlForCell(firstCell);
     //clear the svg of all elements
     this._svg.selectAll('*').remove(); 
     dataSet=data;
@@ -363,7 +357,7 @@ svg
   .text(d=>parseInt(d[measure1][currentYear].value))
 
   
- setTimeout(()=> transition(svg,group,widthScale),1000);
+ setTimeout(()=> transition(svg,group,widthScale),3000);
 }
 
 function transition(svg,group,widthScale){
@@ -382,10 +376,10 @@ function transition(svg,group,widthScale){
   //sort for currentYear
 sortDataSet();
   
-  let dur=2000;
+  let dur=3000;
   let del=100;
  // d3.transition().duration(11000).delay(12000).each(()=>{
-  let myTrans=d3.transition().ease(d3.easeLinear).duration(dur)//.delay((d,i)=>i*del);
+  let myTrans=d3.transition().ease(d3.easeLinear).duration(dur).delay((d,i)=>i*del);
   
   svg.selectAll('.year').transition(myTrans).text('Year = '+currentYear)
   

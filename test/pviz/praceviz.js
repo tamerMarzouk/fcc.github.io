@@ -17,17 +17,17 @@ looker.plugins.visualizations.add({
   var container = element.appendChild(document.createElement("div"));
   container.className = "tmm_main";
   var chart=d3.select('.tmm_main');
-  
+  chart.selectAll('svg').remove();
   var svg=chart.append('svg')
   .attr("preserveAspectRatio", "xMinYMin")
   .attr('width','800px')
   .attr('height','600px')
-  let container=chart.node().getBoundingClientRect();
-   svg.attr('width',container.width+'px');
-  svg.attr('height',container.height+'px');
+  let mycontainer=chart.node().getBoundingClientRect();
+   svg.attr('width',mycontainer.width+'px');
+  svg.attr('height',mycontainer.height+'px');
   
- let w=container.width;
-  let h=container.height;
+ let w=mycontainer.width;
+  let h=mycontainer.height;
   // Create an element to contain the text.
   this._textElement = container.appendChild(document.createElement("div"));
    this._svg=svg;
@@ -35,7 +35,7 @@ looker.plugins.visualizations.add({
     updateAsync: function(data, element, config, queryResponse, details, done) {
          // Grab the first cell of the data.
          this.clearErrors();
-         console.log(data);
+         console.log(element);
          console.log(queryResponse.fields)
          measure0=queryResponse.fields.dimensions[0].name;
          measure1=queryResponse.fields.measures[0].name;

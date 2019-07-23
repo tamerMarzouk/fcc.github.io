@@ -311,7 +311,7 @@ svg
      //  if(interval==null) return;
      // interval=null;
      
-      d3.select('svg').remove();
+      svg.selectAll('*').remove();
       yearsIndex=0;
       currentYear=years[yearsIndex];
       interval=1;

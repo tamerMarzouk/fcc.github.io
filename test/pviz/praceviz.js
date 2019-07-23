@@ -22,7 +22,7 @@ looker.plugins.visualizations.add({
   .attr("preserveAspectRatio", "xMinYMin")
   .attr('width','800px')
   .attr('height','600px')
-  let mycontainer=chart.node().getBoundingClientRect();
+  let mycontainer=container.getBoundingClientRect();
    svg.attr('width',mycontainer.width+'px');
   svg.attr('height',mycontainer.height+'px');
   

@@ -45,9 +45,12 @@ looker.plugins.visualizations.add({
     //     console.log(queryResponse.fields.dimensions);
     // // Insert the data into the page.
     // this._textElement.innerHTML = LookerCharts.Utils.htmlForCell(firstCell);
-     dataSet=data;
+    //clear the svg of all elements
+    this._svg.selectAll('*').remove(); 
+    dataSet=data;
      calcYears();
      prepareData();
+     
      drawChart(this._svg);
    // Always call done to indicate a visualization has finished rendering.
     done()

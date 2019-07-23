@@ -87,7 +87,10 @@ function calcYears(){
 
 function prepareData(){
   //get participants
+  participants=[];
+
   dataSet.forEach(d=>{
+    if(participants.indexOf(d[measure0])>-1) {return;}
     participants.push(d[measure0])
   })
   console.log(participants);

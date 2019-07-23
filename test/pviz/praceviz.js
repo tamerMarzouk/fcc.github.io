@@ -16,10 +16,21 @@ looker.plugins.visualizations.add({
       // Create a container element to let us center the text.
   var container = element.appendChild(document.createElement("div"));
   container.className = "tmm_main";
+  var chart=d3.select('.tmm_main');
   
+  var svg=chart.append('svg')
+  .attr("preserveAspectRatio", "xMinYMin")
+  .attr('width','800px')
+  .attr('height','600px')
+  let container=chart.node().getBoundingClientRect();
+   svg.attr('width',container.width+'px');
+  svg.attr('height',container.height+'px');
+  
+ let w=container.width;
+  let h=container.height;
   // Create an element to contain the text.
   this._textElement = container.appendChild(document.createElement("div"));
-
+   this._svg=svg;
     },
     updateAsync: function(data, element, config, queryResponse, details, done) {
          // Grab the first cell of the data.
@@ -37,7 +48,7 @@ looker.plugins.visualizations.add({
      dataSet=data;
      calcYears();
      prepareData();
-     drawChart();
+     drawChart(this._svg);
    // Always call done to indicate a visualization has finished rendering.
     done()
     }
@@ -263,19 +274,13 @@ function sortDataSet(){
     return b[measure1][currentYear].value-a[measure1][currentYear].value;
   })
 }
-function drawChart(){
+function drawChart(svg){
   
 
   var chart=d3.select('.tmm_main');
-  
-  var svg=chart.append('svg')
-  .attr("preserveAspectRatio", "xMinYMin")
-  .attr('width','800px')
-  .attr('height','600px')
+ 
   let container=chart.node().getBoundingClientRect();
-   // svg.attr('viewBox','0 0 '+Math.min(container.width,container.height) +' '+Math.max(container.width,container.height) )
-        svg.attr('width',container.width+'px');
-  svg.attr('height',container.height+'px');
+  
   
  let w=container.width;
   let h=container.height;
@@ -310,7 +315,7 @@ svg
       yearsIndex=0;
       currentYear=years[yearsIndex];
       interval=1;
-      drawChart();
+      drawChart(svg);
 })
   
   

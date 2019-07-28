@@ -19,7 +19,9 @@ looker.plugins.visualizations.add({
   const height = element.clientHeight
   let w=width-100;
   let h=height-20;
+
   console.log(`Starting with width:${w}, height:${h}`);
+  
   container.className = "tmm_main";
   var chart=d3.select('.tmm_main');
   chart.selectAll('svg').remove();

@@ -17,8 +17,8 @@ looker.plugins.visualizations.add({
   var container = element.appendChild(document.createElement("div"));
   const width = element.clientWidth
   const height = element.clientHeight
-  let w=width-100;
-  let h=height-20;
+  const w=width-100;
+  const h=height-20;
 
   console.log(`Starting with width:${w}, height:${h}`);
   
@@ -299,7 +299,8 @@ function drawChart(svg){
   
  let w=container.width;
   let h=container.height;
-     console.log(`width:${w}, height:${h}`);
+     console.log(`-----inside draw chart width:${w}, height:${h}`);
+     console.log(svg.node().getBBox());
   calcMaxValues(dataSet);
   prepareChart(w,h)
  // console.log(yScale(maxGDP))
@@ -369,6 +370,7 @@ svg
   .style('stroke','red')
   .style('stroke-width','0.3px')
   .attr('class','value')
+  .attr('data-val',d=>d[measure1][currentYear].value)
   .text(d=>parseInt(d[measure1][currentYear].value))
 
   
@@ -411,6 +413,12 @@ sortDataSet();
 //    return d[measure1][currentYear].rendered
 //  })
    
+group.selectAll('.value').transition(myTrans).attr('x',d=>150+widthScale(d[measure1][currentYear].value))
+.attr('y',(d,i,t)=>{
+let newIndex=dataSet.indexOf(d)
+ return newIndex*20+60;
+})
+
 group.selectAll('.value').transition(myTrans).tween("text",(d,i,o)=>{
   var obj=d3.select(o[i]);
 let oldText=obj.attr('data-val');

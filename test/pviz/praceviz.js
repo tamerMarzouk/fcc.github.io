@@ -2,8 +2,8 @@ looker.plugins.visualizations.add({
     create: function(element, config) {
         var css = element.innerHTML = `
         <style>
-          .main {
-            // Vertical centering
+          .tmm_main{
+            /* Vertical centering*/
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -15,19 +15,27 @@ looker.plugins.visualizations.add({
       `;
       // Create a container element to let us center the text.
   var container = element.appendChild(document.createElement("div"));
+  const width = element.clientWidth
+  const height = element.clientHeight
+  let w=width-100;
+  let h=height-20;
+  console.log(`Starting with width:${w}, height:${h}`);
   container.className = "tmm_main";
   var chart=d3.select('.tmm_main');
   chart.selectAll('svg').remove();
+ 
+
   var svg=chart.append('svg')
-  .attr("preserveAspectRatio", "xMinYMin")
-  .attr('width','800px')
-  .attr('height','600px')
-  let mycontainer=container.getBoundingClientRect();
-   svg.attr('width',mycontainer.width+'px');
-  svg.attr('height',mycontainer.height+'px');
+    .attr("preserveAspectRatio", "xMinYMin")
+  .attr('width',w+'px')
+  .attr('height',h+'px')
+ 
+
+  // let mycontainer=container.getBoundingClientRect();
+  //  svg.attr('width',mycontainer.width+'px');
+  // svg.attr('height',mycontainer.height+'px');
   
- let w=mycontainer.width;
-  let h=mycontainer.height;
+
   // Create an element to contain the text.
   this._textElement = container.appendChild(document.createElement("div"));
    this._svg=svg;
@@ -35,8 +43,13 @@ looker.plugins.visualizations.add({
     updateAsync: function(data, element, config, queryResponse, details, done) {
          // Grab the first cell of the data.
          this.clearErrors();
-         console.log(element);
-         console.log(queryResponse.fields)
+        
+
+         // Throw some errors and exit if the shape of the data isn't what this chart needs
+         if (queryResponse.fields.dimensions.length == 0 ||queryResponse.fields.measures.length==0) {
+           this.addError({title: "No Dimensions or Measures", message: "This chart requires 1 dimension for participants and measure with data as a pivot table for years for time."});
+           return;
+         }
          measure0=queryResponse.fields.dimensions[0].name;
          measure1=queryResponse.fields.measures[0].name;
     //clear the svg of all elements
@@ -379,7 +392,7 @@ sortDataSet();
   let dur=3000;
   let del=100;
  // d3.transition().duration(11000).delay(12000).each(()=>{
-  let myTrans=d3.transition().ease(d3.easeLinear).duration(dur).delay((d,i)=>i*del);
+  let myTrans=d3.transition().ease(d3.easeLinear).duration(dur)
   
   svg.selectAll('.year').transition(myTrans).text('Year = '+currentYear)
   
@@ -387,15 +400,25 @@ sortDataSet();
    console.log(currentYear)
    return d[measure0].value+' '+d[measure1][currentYear].value;
  })
- group.selectAll('.value').transition(myTrans).attr('x',d=>150+widthScale(d[measure1][currentYear].value))
-  .attr('y',(d,i,t)=>{
-  let newIndex=dataSet.indexOf(d)
-   return newIndex*20+60;
- }).text(d=>{
-   console.log(currentYear)
-   return d[measure1][currentYear].rendered
- })
+//  group.selectAll('.value').transition(myTrans).attr('x',d=>150+widthScale(d[measure1][currentYear].value))
+//   .attr('y',(d,i,t)=>{
+//   let newIndex=dataSet.indexOf(d)
+//    return newIndex*20+60;
+//  }).text(d=>{
+//    console.log(currentYear)
+//    return d[measure1][currentYear].rendered
+//  })
    
+group.selectAll('.value').transition(myTrans).tween("text",(d,i,o)=>{
+  var obj=d3.select(o[i]);
+let oldText=obj.attr('data-val');
+//console.log(oldText,obj,d[measure1][currentYear].value);
+var inter=d3.interpolate(oldText,d[measure1][currentYear].value)
+return (t)=>{
+ obj.text(inter(t));
+}
+})
+
  group.selectAll('.participant').transition(myTrans).attr('y',(d,i,t)=>{
  let newIndex=dataSet.indexOf(d)
    return newIndex*20+60

@@ -414,7 +414,7 @@ function drawChart(svg) {
   setTimeout(() => transition(svg, group), 1000);
 }
 
-function transition(svg, group, widthScale) {
+function transition(svg, group) {
   if (interval == null) {
     return;//stop repeating the transition 
   }

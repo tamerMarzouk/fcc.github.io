@@ -296,9 +296,11 @@ function updateAxis(dataset, w, h) {
 function customXAxis(g) {
   g.call(xAxis);
   g.select(".domain").remove();
+  g.selectAll(".tick").attr('color','blue');
   g.selectAll(".tick:first-of-type line").attr("stroke", "currentColor").attr("stroke-dasharray", "3,5");
   g.selectAll(".tick:not(:first-of-type) line").attr("stroke", "currentColor").attr("stroke-dasharray", "1,9");
   g.selectAll(".tick text").attr("x", 4).attr("dy", -4);
+  
 }
 
 function sortDataSet() {
@@ -415,6 +417,7 @@ function drawChart(svg) {
 }
 
 function transition(svg, group) {
+  console.log('-----Starting transition ', interval);
   if (interval == null) {
     return;//stop repeating the transition 
   }

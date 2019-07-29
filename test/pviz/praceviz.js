@@ -29,8 +29,8 @@ looker.plugins.visualizations.add({
 
     var svg = chart.append('svg')
       .attr("preserveAspectRatio", "xMinYMin")
-      .attr('width', w + 'px')
-      .attr('height', h + 'px')
+      .attr('width', '800px')
+      .attr('height',  '600px')
 
 
     // let mycontainer=container.getBoundingClientRect();
@@ -375,7 +375,7 @@ function drawChart(svg) {
     .enter()
   var group = mysvg.append('g')
   group.append('rect')
-    .attr('x', 130)
+    .attr('x', 30)
     .attr('y', (d, i) => i * 20 + 50)
     .attr('key', (d, i) => i)
     .attr('width', (d) => widthScale(parseFloat(d[measure1][currentYear].value)) - 30)

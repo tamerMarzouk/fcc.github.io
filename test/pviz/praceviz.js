@@ -258,28 +258,46 @@ function prepareData(){
 }
 
 
-var overallMin=0;
-var overallMax=0;
-function calcMaxValues(dataset){
-  var maxValues=[];
-var minValues=[];
-  for(let i=0;i<years.length-1;i++){
-    let myyear=years[i];
-    let minmax=d3.extent(dataset,d=>d[measure1][myyear].value);
-    console.log('Year:',years[i], ', minimum:',minmax[0],', maximum:',minmax[1])  
-    maxValues.push(minmax[1]);
-    minValues.push(minmax[0])
-  }
-  overallMax=d3.max(maxValues);
-  overallMin=d3.min(minValues);
-  console.log(overallMin,overallMax);
+// var overallMin=0;
+// var overallMax=0;
+// function calcMaxValues(dataset){
+//   var maxValues=[];
+// var minValues=[];
+//   for(let i=0;i<years.length-1;i++){
+//     let myyear=years[i];
+//     let minmax=d3.extent(dataset,d=>d[measure1][myyear].value);
+//     console.log('Year:',years[i], ', minimum:',minmax[0],', maximum:',minmax[1])  
+//     maxValues.push(minmax[1]);
+//     minValues.push(minmax[0])
+//   }
+//   overallMax=d3.max(maxValues);
+//   overallMin=d3.min(minValues);
+//   console.log(overallMin,overallMax);
+// }
+
+var widthScale=null;
+var xAxis;
+var w;
+var h;
+function updateAxis(dataset,w,h){
+  
+  let minmax=d3.extent(dataset,d=>d[measure1][currentYear].value);
+  
+ if(widthScale==null){ widthScale=d3.scaleLinear().domain(minmax).range([30,w-200]);
+                     }else{
+                       widthScale.domain(minmax);
+                     }
+  console.log(`currentYear:${currentYear}, width:${w}, height:${h}`,minmax,widthScale(minmax[0]),widthScale(minmax[1]))
+    xAxis= d3.axisTop().scale(widthScale)
+    .tickSize(h)
 }
 
- var widthScale;
-function prepareChart(w,h){
- widthScale=d3.scaleLinear().domain([overallMax,overallMin]).range([w,0]);
-  // console.log(widthScale(overallMin))
-  // console.log(widthScale(overallMax))
+function customXAxis(g){
+  g.call(xAxis);
+  g.select(".domain").remove();
+ g.selectAll(".tick:first-of-type line").attr("stroke", "#777").attr("stroke-dasharray", "3,5");
+  g.selectAll(".tick:not(:first-of-type) line").attr("stroke", "#777").attr("stroke-dasharray", "1,9");
+   g.selectAll(".tick text").attr("x", 4).attr("dy", -4);
 }
 
 function sortDataSet(){
@@ -301,8 +319,8 @@ function drawChart(svg){
   let h=container.height;
      console.log(`-----inside draw chart width:${w}, height:${h}`);
      console.log(svg.node().getBBox());
-  calcMaxValues(dataSet);
-  prepareChart(w,h)
+  // calcMaxValues(dataSet);
+  // prepareChart(w,h)
  // console.log(yScale(maxGDP))
  // console.log(widthScale(minGDP))
  sortDataSet();
@@ -314,6 +332,14 @@ svg
   .attr('y',20)
   .attr('class','year')
   .text('Year = '+currentYear)
+  .on('click',()=>{
+    if(interval!=null){
+      interval=null;
+    }else{
+      interval=1;
+    }
+    console.log('==PAUSED==')
+  })
   //replay
     svg
   .append('text')
@@ -334,7 +360,15 @@ svg
       drawChart(svg);
 })
   
-  
+  //draw axis
+  console.log(`---drawing axis -width, height- ${w} ,  ${h}`);
+  updateAxis(dataSet,w,h);
+ svg.append("g")
+  .attr('class','custom-axis')
+   .attr("transform", "translate(0," + (h+50) + ")")
+   .call(customXAxis);
+
+
   var mysvg=svg.selectAll('rect')
       .data(dataSet)
   .enter()
@@ -343,18 +377,20 @@ svg
   .attr('x',130)
   .attr('y',(d,i)=>i*20+50)
   .attr('key',(d,i)=>i)
-  .attr('width',(d)=>widthScale(parseFloat(d[measure1][currentYear].value)))
+  .attr('width',(d)=>widthScale(parseFloat(d[measure1][currentYear].value))-30)
   .attr('height',12)
   .attr('fill',d=>colorScale(d[measure0].value))
    .on('click',o=>{
-  console.log(o['Country Code'])
+  console.log(o)
 })
   group.append('title')
   .attr('class','title')
 .attr('key',(d,i)=>i)
     .text(d=>d[measure0].value+' '+d[measure1][currentYear].value)
   group.append('text')
-  .attr('x',20)
+  // .attr('x',20)
+  // .attr('y',(d,i)=>i*20+60)
+  .attr('x',d=>10+widthScale(d[measure1][currentYear].value))
   .attr('y',(d,i)=>i*20+60)
   .attr('key',(d,i)=>i)
   .attr('font-size',10)
@@ -362,19 +398,19 @@ svg
   .attr('class','participant')
   .text(d=>d[measure0].value)
    group.append('text')
-  .attr('x',d=>150+widthScale(d[measure1][currentYear].value))
+  .attr('x',d=>50+widthScale(d[measure1][currentYear].value))
   .attr('y',(d,i)=>i*20+60)
    .attr('key',(d,i)=>i)
   .attr('font-size',10)
   .attr('fill','black')
-  .style('stroke','red')
+  .style('stroke','green')
   .style('stroke-width','0.3px')
   .attr('class','value')
   .attr('data-val',d=>d[measure1][currentYear].value)
   .text(d=>parseInt(d[measure1][currentYear].value))
 
   
- setTimeout(()=> transition(svg,group,widthScale),3000);
+ setTimeout(()=> transition(svg,group),1000);
 }
 
 function transition(svg,group,widthScale){
@@ -393,25 +429,21 @@ function transition(svg,group,widthScale){
   //sort for currentYear
 sortDataSet();
   
-  let dur=3000;
+  let dur=13000;
   let del=100;
  // d3.transition().duration(11000).delay(12000).each(()=>{
   let myTrans=d3.transition().ease(d3.easeLinear).duration(dur)
   
+  //update Axis
+  updateAxis(dataSet,w,h);
+  svg.selectAll('.custom-axis').transition(myTrans).call(customXAxis);
+
   svg.selectAll('.year').transition(myTrans).text('Year = '+currentYear)
   
      group.selectAll('.title').transition(myTrans).text(d=>{
    console.log(currentYear)
    return d[measure0].value+' '+d[measure1][currentYear].value;
  })
-//  group.selectAll('.value').transition(myTrans).attr('x',d=>150+widthScale(d[measure1][currentYear].value))
-//   .attr('y',(d,i,t)=>{
-//   let newIndex=dataSet.indexOf(d)
-//    return newIndex*20+60;
-//  }).text(d=>{
-//    console.log(currentYear)
-//    return d[measure1][currentYear].rendered
-//  })
    
 group.selectAll('.value').transition(myTrans).attr('x',d=>150+widthScale(d[measure1][currentYear].value))
 .attr('y',(d,i,t)=>{
@@ -422,18 +454,18 @@ let newIndex=dataSet.indexOf(d)
 group.selectAll('.value').transition(myTrans).tween("text",(d,i,o)=>{
   var obj=d3.select(o[i]);
 let oldText=obj.attr('data-val');
-//console.log(oldText,obj,d[measure1][currentYear].value);
 var inter=d3.interpolate(oldText,d[measure1][currentYear].value)
 return (t)=>{
  obj.text(inter(t));
 }
 })
 
- group.selectAll('.participant').transition(myTrans).attr('y',(d,i,t)=>{
+ group.selectAll('.participant').transition(myTrans).attr('x',d=>50+widthScale(d[measure1][currentYear].value))
+ .attr('y',(d,i,t)=>{
  let newIndex=dataSet.indexOf(d)
    return newIndex*20+60
  })
-  group.selectAll('rect').transition(myTrans).attr('width',d=>widthScale(d[measure1][currentYear].value))
+  group.selectAll('rect').transition(myTrans).attr('width',d=>widthScale(d[measure1][currentYear].value)-30)
      .attr('y',(d,i,t)=>{
        let newIndex=dataSet.indexOf(d)
      
@@ -442,9 +474,9 @@ return (t)=>{
   
   
     
-//  })
+
 myTrans.on('end',()=>{
     console.log(' calling transition!:',yearsIndex)
-    setTimeout(()=>{transition(svg,group,widthScale)},1000*yearsIndex)
+    setTimeout(()=>{transition(svg,group)},1000*yearsIndex)
   });
 }

@@ -1,7 +1,7 @@
 /*
 @Copywrite Tamer Marzouk
   wirtten for Pegasus-oe
-  21:56
+  23:08
 */
 
 looker.plugins.visualizations.add({
@@ -125,7 +125,13 @@ function calcYears() {
   currentYear = years[yearsIndex];
 }
 
-
+function parseNumber(x){
+  if(x==null ||x==undefined){
+    return 0.0;
+  }else{
+    return parseFloat(x);
+  }
+}
 
 function prepareData() {
   //get participants
@@ -398,7 +404,7 @@ function drawChart(svg) {
     .attr('x', 30)
     .attr('y', (d, i) => i * 20 + 50)
     .attr('key', (d, i) => i)
-    .attr('width', (d) => widthScale(parseFloat(d[measure1][currentYear].value)) - 30)
+    .attr('width', (d) => widthScale(parseNumber(d[measure1][currentYear].value)) - 30)
     .attr('height', 12)
     .attr('fill', d => colorScale(d[measure0].value))
     .on('click', o => {

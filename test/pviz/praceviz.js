@@ -1,4 +1,13 @@
 looker.plugins.visualizations.add({
+  options:{
+    stepDuration:{ type: "number",
+    label: "Animation Duration",
+    display: "range",
+    max:20000,
+    min:100,
+    step:100,
+  }
+  },
   create: function (element, config) {
     var css = element.innerHTML = `
         <style>

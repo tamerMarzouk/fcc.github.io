@@ -258,23 +258,6 @@ function prepareData() {
 }
 
 
-// var overallMin=0;
-// var overallMax=0;
-// function calcMaxValues(dataset){
-//   var maxValues=[];
-// var minValues=[];
-//   for(let i=0;i<years.length-1;i++){
-//     let myyear=years[i];
-//     let minmax=d3.extent(dataset,d=>d[measure1][myyear].value);
-//     console.log('Year:',years[i], ', minimum:',minmax[0],', maximum:',minmax[1])  
-//     maxValues.push(minmax[1]);
-//     minValues.push(minmax[0])
-//   }
-//   overallMax=d3.max(maxValues);
-//   overallMin=d3.min(minValues);
-//   console.log(overallMin,overallMax);
-// }
-
 var widthScale = null;
 var xAxis;
 var w;
@@ -440,7 +423,10 @@ function transition(svg, group) {
 
   //update Axis
   updateAxis(dataSet, w, h);
-  svg.selectAll('.custom-axis').transition(myTrans).call(customXAxis);
+  svg.selectAll('.custom-axis').transition(myTrans).call(customXAxis).on("start", function(){
+    //remove the domain path during transition
+    svg.select(".custom-axis .domain").remove();
+});
 
   svg.selectAll('.year').transition(myTrans).text('Year = ' + currentYear)
 

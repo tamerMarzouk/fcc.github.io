@@ -314,8 +314,8 @@ function customXAxis(g) {
   g.selectAll(".tick").attr('color', axiscolor);
   g.selectAll(".tick:first-of-type line").attr("stroke", axiscolor).attr("stroke-dasharray", "3,5");
   g.selectAll(".tick:not(:first-of-type) line").attr("stroke", axiscolor).attr("stroke-dasharray", "1,9");
-  //g.selectAll(".tick text").attr("x", 4).attr("dy", -4);
-
+  g.selectAll(".tick text").attr("x", 4).attr("dy", -4);
+g.selectAll(".tick line").attr("x",4).attr
 }
 
 function sortDataSet() {
@@ -381,7 +381,7 @@ function drawChart(svg) {
   updateAxis(dataSet, w, h);
   svg.append("g")
     .attr('class', 'custom-axis')
-    .attr("transform", "translate(0," + (h + 50) + ")")
+    .attr("transform", "translate(0," + (50) + ")")
     .attr('fill',myconf.axiscolor)
     .call(customXAxis);
 

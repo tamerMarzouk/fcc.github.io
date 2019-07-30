@@ -43,7 +43,7 @@ looker.plugins.visualizations.add({
     const w = width - 100;
     const h = height - 20;
 
-    console.log(`Starting with width:${w}, height:${h}`);
+    console.log(`Config with width:${w}, height:${h}`);
 
     container.className = "tmm_main";
     var chart = d3.select('.tmm_main');
@@ -287,7 +287,7 @@ function prepareData() {
 
 }
 
-
+var dataSet={};
 var widthScale = null;
 var xAxis;
 var w;
@@ -336,7 +336,7 @@ function drawChart(svg) {
 
   let w =800;// container.width;
   let h =600;// container.height;
-  console.log(`-----inside draw chart width:${w}, height:${h}`);
+  console.log(`-----inside draw chart width:${w}, height:${h}`,dataSet);
   console.log(svg.node().getBBox());
   // calcMaxValues(dataSet);
   // prepareChart(w,h)

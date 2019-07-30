@@ -294,7 +294,8 @@ var w;
 var h;
 //var axiscolor = blue;
 function updateAxis(dataset, w, h) {
-
+w=800;
+h=600;
   let minmax = d3.extent(dataset, d => d[measure1][currentYear].value);
 
   if (widthScale == null) {

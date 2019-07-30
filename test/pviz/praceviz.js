@@ -1,7 +1,7 @@
 /*
 @Copywrite Tamer Marzouk
   wirtten for Pegasus-oe
-  13:09
+  13:11
 */
 
 looker.plugins.visualizations.add({
@@ -292,7 +292,7 @@ var widthScale = null;
 var xAxis;
 var w;
 var h;
-var axiscolor = blue;
+//var axiscolor = blue;
 function updateAxis(dataset, w, h) {
 
   let minmax = d3.extent(dataset, d => d[measure1][currentYear].value);

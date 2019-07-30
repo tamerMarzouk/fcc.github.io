@@ -8,6 +8,12 @@ looker.plugins.visualizations.add({
       min: 100,
       step: 100,
       default: 5000,
+    },
+    axiscolor: {
+      type: 'string',
+      label: 'Axis Color',
+      display: 'color',
+      default: 'blue',
     }
   },
   create: function (element, config) {
@@ -57,7 +63,6 @@ looker.plugins.visualizations.add({
     // Grab the first cell of the data.
     this.clearErrors();
 
-    interval = 1;
     // Throw some errors and exit if the shape of the data isn't what this chart needs
     if (queryResponse.fields.dimensions.length == 0 || queryResponse.fields.measures.length == 0) {
       this.addError({ title: "No Dimensions or Measures", message: "This chart requires 1 dimension for participants and 1 measure with data as a pivot table for years or time." });
@@ -70,8 +75,10 @@ looker.plugins.visualizations.add({
     dataSet = data;
     calcYears();
     prepareData();
-
-    drawChart(this._svg, config.duration);
+    myconf.duration = config.duration;
+    myconf.axiscolor = config.axiscolor;
+    myconf.allowAnimation = true;
+    drawChart(this._svg);
     // Always call done to indicate a visualization has finished rendering.
     done()
   }
@@ -84,10 +91,14 @@ var colorScale;
 var currentYear = 0;
 var years = [];
 var yearsIndex = 0;
-var interval = 1;
 var fixedData;
 var measure0;
 var measure1;
+const myconf = {
+  duration: 10000,
+  axiscolor: 'blue',
+  allowAnimation: true,
+}
 
 function calcYears() {
   //console.log(dataSet[0][measure1])
@@ -273,6 +284,7 @@ var widthScale = null;
 var xAxis;
 var w;
 var h;
+var axiscolor = blue;
 function updateAxis(dataset, w, h) {
 
   let minmax = d3.extent(dataset, d => d[measure1][currentYear].value);
@@ -288,11 +300,12 @@ function updateAxis(dataset, w, h) {
 }
 
 function customXAxis(g) {
+  let axiscolor = myconf.axiscolor;
   g.call(xAxis);
   g.select(".domain").remove();
-  g.selectAll(".tick").attr('color', 'blue');
-  g.selectAll(".tick:first-of-type line").attr("stroke", "currentColor").attr("stroke-dasharray", "3,5");
-  g.selectAll(".tick:not(:first-of-type) line").attr("stroke", "currentColor").attr("stroke-dasharray", "1,9");
+  g.selectAll(".tick").attr('color', axiscolor);
+  g.selectAll(".tick:first-of-type line").attr("stroke", axiscolor).attr("stroke-dasharray", "3,5");
+  g.selectAll(".tick:not(:first-of-type) line").attr("stroke", axiscolor).attr("stroke-dasharray", "1,9");
   g.selectAll(".tick text").attr("x", 4).attr("dy", -4);
 
 }
@@ -304,7 +317,7 @@ function sortDataSet() {
     return b[measure1][currentYear].value - a[measure1][currentYear].value;
   })
 }
-function drawChart(svg, duration) {
+function drawChart(svg) {
 
 
   var chart = d3.select('.tmm_main');
@@ -330,12 +343,12 @@ function drawChart(svg, duration) {
     .attr('class', 'year')
     .text('Year = ' + currentYear)
     .on('click', () => {
-      if (interval != null) {
-        interval = null;
+      if (myconf.allowAnimation) {
+        myconf.allowAnimation = false;
       } else {
-        interval = 1;
+        myconf.allowAnimation = true;
       }
-      console.log('==PAUSED==')
+      console.log('==PAUSED==', myconf.allowAnimation);
     })
   //replay
   svg
@@ -347,13 +360,11 @@ function drawChart(svg, duration) {
     .attr('class', 'button')
     .text('Replay')
     .on('click', o => {
-      //  if(interval==null) return;
-      // interval=null;
 
       svg.selectAll('*').remove();
       yearsIndex = 0;
       currentYear = years[yearsIndex];
-      interval = 1;
+      myconf.allowAnimation = true;
       drawChart(svg);
     })
 
@@ -407,17 +418,17 @@ function drawChart(svg, duration) {
     .text(d => parseInt(d[measure1][currentYear].value))
 
 
-  setTimeout(() => transition(svg, group, duration), 1000);
+  setTimeout(() => transition(svg, group), 1000);
 }
 
-function transition(svg, group, duration) {
-  console.log('-----Starting transition ', interval);
-  if (interval == null) {
+function transition(svg, group) {
+  console.log('-----Starting transition ', myconf.allowAnimation);
+  if (!myconf.allowAnimation) {
     return;//stop repeating the transition 
   }
   yearsIndex++;
   if (yearsIndex > years.length - 1) {
-    interval = null;
+    myconf.allowAnimation = false;
     //console.log(currentYear)
     return;
   }
@@ -427,7 +438,7 @@ function transition(svg, group, duration) {
   //sort for currentYear
   sortDataSet();
 
-  let dur = duration || 13000;
+  let dur = myconf.duration;
   let del = 100;
   // d3.transition().duration(11000).delay(12000).each(()=>{
   let myTrans = d3.transition().ease(d3.easeLinear).duration(dur)

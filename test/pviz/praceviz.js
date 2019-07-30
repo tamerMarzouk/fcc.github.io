@@ -374,6 +374,7 @@ function drawChart(svg) {
   svg.append("g")
     .attr('class', 'custom-axis')
     .attr("transform", "translate(0," + (h + 50) + ")")
+    .attr('fill',myconf.axiscolor)
     .call(customXAxis);
 
 

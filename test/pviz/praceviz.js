@@ -84,7 +84,7 @@ looker.plugins.visualizations.add({
     myconf.duration = config.duration;
     myconf.axiscolor = config.axiscolor;
     myconf.allowAnimation = true;
-    svg.selectAll('*').remove();
+    
     yearsIndex = 0;
     currentYear = years[yearsIndex];
     drawChart(this._svg);

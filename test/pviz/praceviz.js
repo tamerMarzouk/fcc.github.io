@@ -111,7 +111,9 @@ function calcYears() {
     return 0;
   });
   console.log(years)
-  currentYear = d3.min(years);
+  yearsIndex=0;
+  
+  currentYear = years[yearsIndex];
 }
 
 

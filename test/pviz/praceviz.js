@@ -313,9 +313,9 @@ function customXAxis(g) {
   g.call(xAxis);
   g.select(".domain").remove();
   g.selectAll(".tick").attr('color', axiscolor);
-  g.selectAll(".tick:first-of-type line").attr("stroke", axiscolor).attr("stroke-dasharray", "3,5");
-  g.selectAll(".tick:not(:first-of-type) line").attr("stroke", axiscolor).attr("stroke-dasharray", "1,9");
-  g.selectAll(".tick text").attr("x", 4).attr("dy", -4);
+  g.selectAll(".tick line").attr("stroke", axiscolor).attr("stroke-dasharray", "3,5");
+  //g.selectAll(".tick:not(:first-of-type) line").attr("stroke", axiscolor).attr("stroke-dasharray", "1,9");
+  g.selectAll(".tick text").attr("x", "4").attr("dy", "-4");
 
 }
 

@@ -1,7 +1,7 @@
 /*
 @Copywrite Tamer Marzouk
   wirtten for Pegasus-oe
-  20:53
+  21:56
 */
 
 looker.plugins.visualizations.add({
@@ -84,6 +84,9 @@ looker.plugins.visualizations.add({
     myconf.duration = config.duration;
     myconf.axiscolor = config.axiscolor;
     myconf.allowAnimation = true;
+    svg.selectAll('*').remove();
+    yearsIndex = 0;
+    currentYear = years[yearsIndex];
     drawChart(this._svg);
     // Always call done to indicate a visualization has finished rendering.
     done()
@@ -350,7 +353,7 @@ function drawChart(svg) {
     .attr('x', 160)
     .attr('y', 20)
     .attr('class', 'year')
-    .text('Year = ' + currentYear)
+    .text(' ' + currentYear)
     .on('click', () => {
       if (myconf.allowAnimation) {
         myconf.allowAnimation = false;

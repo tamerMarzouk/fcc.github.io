@@ -1,3 +1,8 @@
+/*
+@Copywrite Tamer Marzouk
+  wirtten for Pegasus-oe
+*/
+
 looker.plugins.visualizations.add({
   options: {
     duration: {
@@ -398,7 +403,7 @@ function drawChart(svg) {
     .attr('class', 'title')
     .attr('key', (d, i) => i)
     .text(d => d[measure0].value + ' ' + d[measure1][currentYear].value)
-  group.append('text')
+ let textElement= group.append('text')
     // .attr('x',20)
     // .attr('y',(d,i)=>i*20+60)
     .attr('x', d => 10 + widthScale(d[measure1][currentYear].value))
@@ -408,8 +413,11 @@ function drawChart(svg) {
     .attr('fill', 'black')
     .attr('class', 'participant')
     .text(d => d[measure0].value)
+    //calc participant text length
+    let textLength=textElement.node().getComputedTextLength();
+    console.log('textlength: ',textLength);
   group.append('text')
-    .attr('x', d => 50 + widthScale(d[measure1][currentYear].value))
+    .attr('x', d => textLength+10 + widthScale(d[measure1][currentYear].value))
     .attr('y', (d, i) => i * 20 + 60)
     .attr('key', (d, i) => i)
     .attr('font-size', 10)

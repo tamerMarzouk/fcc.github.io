@@ -1,12 +1,14 @@
 looker.plugins.visualizations.add({
-  options:{
-    stepDuration:{ type: "number",
-    label: "Animation Duration",
-    display: "range",
-    max:20000,
-    min:100,
-    step:100,
-  }
+  options: {
+    duration: {
+      type: "number",
+      label: "Animation time",
+      display: "range",
+      max: 30000,
+      min: 100,
+      step: 100,
+      default: 5000,
+    }
   },
   create: function (element, config) {
     var css = element.innerHTML = `
@@ -39,7 +41,7 @@ looker.plugins.visualizations.add({
     var svg = chart.append('svg')
       .attr("preserveAspectRatio", "xMinYMin")
       .attr('width', '800px')
-      .attr('height',  '600px')
+      .attr('height', '600px')
 
 
     // let mycontainer=container.getBoundingClientRect();
@@ -55,10 +57,10 @@ looker.plugins.visualizations.add({
     // Grab the first cell of the data.
     this.clearErrors();
 
-
+    interval = 1;
     // Throw some errors and exit if the shape of the data isn't what this chart needs
     if (queryResponse.fields.dimensions.length == 0 || queryResponse.fields.measures.length == 0) {
-      this.addError({ title: "No Dimensions or Measures", message: "This chart requires 1 dimension for participants and measure with data as a pivot table for years for time." });
+      this.addError({ title: "No Dimensions or Measures", message: "This chart requires 1 dimension for participants and 1 measure with data as a pivot table for years or time." });
       return;
     }
     measure0 = queryResponse.fields.dimensions[0].name;
@@ -69,7 +71,7 @@ looker.plugins.visualizations.add({
     calcYears();
     prepareData();
 
-    drawChart(this._svg);
+    drawChart(this._svg, config.duration);
     // Always call done to indicate a visualization has finished rendering.
     done()
   }
@@ -288,11 +290,11 @@ function updateAxis(dataset, w, h) {
 function customXAxis(g) {
   g.call(xAxis);
   g.select(".domain").remove();
-  g.selectAll(".tick").attr('color','blue');
+  g.selectAll(".tick").attr('color', 'blue');
   g.selectAll(".tick:first-of-type line").attr("stroke", "currentColor").attr("stroke-dasharray", "3,5");
   g.selectAll(".tick:not(:first-of-type) line").attr("stroke", "currentColor").attr("stroke-dasharray", "1,9");
   g.selectAll(".tick text").attr("x", 4).attr("dy", -4);
-  
+
 }
 
 function sortDataSet() {
@@ -302,7 +304,7 @@ function sortDataSet() {
     return b[measure1][currentYear].value - a[measure1][currentYear].value;
   })
 }
-function drawChart(svg) {
+function drawChart(svg, duration) {
 
 
   var chart = d3.select('.tmm_main');
@@ -405,10 +407,10 @@ function drawChart(svg) {
     .text(d => parseInt(d[measure1][currentYear].value))
 
 
-  setTimeout(() => transition(svg, group), 1000);
+  setTimeout(() => transition(svg, group, duration), 1000);
 }
 
-function transition(svg, group) {
+function transition(svg, group, duration) {
   console.log('-----Starting transition ', interval);
   if (interval == null) {
     return;//stop repeating the transition 
@@ -425,17 +427,17 @@ function transition(svg, group) {
   //sort for currentYear
   sortDataSet();
 
-  let dur = 13000;
+  let dur = duration || 13000;
   let del = 100;
   // d3.transition().duration(11000).delay(12000).each(()=>{
   let myTrans = d3.transition().ease(d3.easeLinear).duration(dur)
 
   //update Axis
   updateAxis(dataSet, w, h);
-  svg.selectAll('.custom-axis').transition(myTrans).call(customXAxis).on("start", function(){
+  svg.selectAll('.custom-axis').transition(myTrans).call(customXAxis).on("start", function () {
     //remove the domain path during transition
     svg.select(".custom-axis .domain").remove();
-});
+  });
 
   svg.selectAll('.year').transition(myTrans).text('Year = ' + currentYear)
 

@@ -1,7 +1,7 @@
 /*
 @Copywrite Tamer Marzouk
   wirtten for Pegasus-oe
-  20:34
+  20:53
 */
 
 looker.plugins.visualizations.add({
@@ -313,9 +313,9 @@ function customXAxis(g) {
   g.call(xAxis);
   g.select(".domain").remove();
   g.selectAll(".tick").attr('color', axiscolor);
-  g.selectAll(".tick line").attr("stroke", axiscolor).attr("stroke-dasharray", "3,5");
+  g.selectAll(".tick line").attr("stroke", axiscolor).attr("stroke-dasharray", "1,9");
   //g.selectAll(".tick:not(:first-of-type) line").attr("stroke", axiscolor).attr("stroke-dasharray", "1,9");
-  g.selectAll(".tick text").attr("x", "4").attr("dy", "-4");
+  g.selectAll(".tick text").attr("x", "4px").attr("dy", "-4px");
 
 }
 
@@ -457,18 +457,19 @@ function transition(svg, group) {
   let myTrans = d3.transition().ease(d3.easeLinear).duration(dur)
 
   //update Axis
-  updateAxis(dataSet, w, h);
+  
   svg.selectAll('.custom-axis').transition(myTrans).call(customXAxis).on("start", function () {
+    updateAxis(dataSet, w, h);
     //remove the domain path during transition
     svg.select(".custom-axis .domain").remove();
     svg.select(".custom-axis").attr('fill',myconf.axiscolor);
   });
 
-  svg.selectAll('.year').transition(myTrans).text('Year = ' + currentYear)
+  svg.selectAll('.year').transition(myTrans).text(' ' + currentYear)
 
   group.selectAll('.title').transition(myTrans).text(d => {
     console.log(currentYear)
-    return d[measure0].value + ' ' + d[measure1][currentYear].value;
+    return d[measure0].value + ' ' + d[measure1][currentYear].rendered;
   })
 
   group.selectAll('.value').transition(myTrans).attr('x', d => 150 + widthScale(d[measure1][currentYear].value))

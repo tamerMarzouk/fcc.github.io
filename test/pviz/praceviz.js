@@ -325,8 +325,8 @@ function drawChart(svg) {
   let container = chart.node().getBoundingClientRect();
 
 
-  let w = container.width;
-  let h = container.height;
+  let w =800;// container.width;
+  let h =600;// container.height;
   console.log(`-----inside draw chart width:${w}, height:${h}`);
   console.log(svg.node().getBBox());
   // calcMaxValues(dataSet);
@@ -429,7 +429,7 @@ function transition(svg, group) {
   yearsIndex++;
   if (yearsIndex > years.length - 1) {
     myconf.allowAnimation = false;
-    //console.log(currentYear)
+    console.log('Reached end of animation-->',currentYear)
     return;
   }
 

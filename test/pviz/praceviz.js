@@ -459,6 +459,7 @@ function transition(svg, group) {
   svg.selectAll('.custom-axis').transition(myTrans).call(customXAxis).on("start", function () {
     //remove the domain path during transition
     svg.select(".custom-axis .domain").remove();
+    svg.select(".custom-axis").attr('fill',myconf.axiscolor);
   });
 
   svg.selectAll('.year').transition(myTrans).text('Year = ' + currentYear)

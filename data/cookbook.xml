@@ -1,0 +1,38 @@
+<cookbook>
+<recipe>
+<title>Omelette</title>
+<imge>img/omelette.jpg</imge>
+<ingredients>
+<ingredient>
+<name>eggs</name>
+<amount>4</amount>
+</ingredient>
+<ingredient>
+<name>cherry tomatos</name>
+<amount>9 pieces </amount>
+</ingredient>
+<ingredient>
+<name>olive oil</name>
+<amount>1 tbsp</amount>
+</ingredient>
+</ingredients>
+</recipe>
+<recipe>
+<title>Grilled Chicken</title>
+<imge>img/grilledChicken.jpg</imge>
+<ingredients>
+<ingredient>
+<name>chicken</name>
+<amount>4 chicken breasts</amount>
+</ingredient>
+<ingredient>
+<name>oregano</name>
+<amount>1 tbsp</amount>
+</ingredient>
+<ingredient>
+<name>olive oil</name>
+<amount>2 tbsp</amount>
+</ingredient>
+</ingredients>
+</recipe>
+</cookbook>
